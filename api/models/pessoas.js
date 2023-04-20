@@ -14,18 +14,52 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'docente_id'
       })
       Pessoas.hasMany(models.Matriculas, {
-        foreignKey: 'estudante_id'
+        foreignKey: 'estudante_id',
+        scope: {
+          status: 'confirmado',
+        },
+        as: 'AulasMatriculadas'
       })
     }
   }
   Pessoas.init({
-    nome: DataTypes.STRING,
+    nome: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        funcaoValidadora: function (dado) {
+          if (dado.length < 3)
+            throw new Error('O campo nome deve ter mais de três caracteres');
+        },
+        notNull: {
+          msg: 'O campo Nome é obrigatório.'
+        }
+      }
+    },
     ativo: DataTypes.BOOLEAN,
-    email: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: {
+          args: true,
+          msg: 'dado do tipo e-mail inválido!'
+        }
+      }
+    },
     role: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Pessoas',
+    paranoid: true,
+    defaultScope: {
+      where: {
+        ativo: true,
+      }
+    },
+    scopes: {
+      todos: {
+        where: { }}
+    }
   });
   return Pessoas;
 };

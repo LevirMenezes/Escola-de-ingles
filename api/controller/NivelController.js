@@ -1,4 +1,6 @@
 const database = require('../models');
+const { NiveisServices } = require('../services');
+const niveisServices = new NiveisServices();
 
 class NivelController {
 
@@ -63,6 +65,19 @@ class NivelController {
     } catch (erro)
     {
       return res.status(500).json(erro.message);
+    }
+  }
+
+  static async restauraNivel(req, res) {
+    const { id } = req.params;
+    try
+    {
+      await database.Niveis.restore({ where: { id: Number(id) } });
+
+      return res.status(200).json({ mensagem: `O nivel com id ${id} foi restaurado!`})
+    } catch (erro)
+    {
+      return res.status(500).json(erro.message)
     }
   }
 }
